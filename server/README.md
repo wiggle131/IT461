@@ -1,10 +1,4 @@
-# Installation instructions
-## Build the containers
-### $ docker-compose build
-## Start the containers
-### $ docker-compose up
-## Shutdown the containers
-### $ docker-compose down
+# IT461
+Flask in a docker
 
-# Usage
-## Use Postman to send request to http://127.0.0.1:6000
+Author: Jhosie Charles Espantaleon BSCS-4
