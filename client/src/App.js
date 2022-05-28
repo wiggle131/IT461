@@ -13,8 +13,9 @@ import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import useAxiosPrivate from './hooks/useAxiosPrivate';
 import DogAdd from './components/DogAdd';
-import DogDetail from './components/DogDetail';
-import DogEdit from './components/DogEdit';
+import DogView from './components/DogView';
+import useAuth from './hooks/useAuth';
+import DogDelete from './components/DogDelete';
 
 const ROLES = {
   'User': 2001,
@@ -22,15 +23,17 @@ const ROLES = {
   'Admin': 5150
 }
 
+
 function App() {
   const [dogs, setDogs] = useState([]);
   const [url, setUrl] = useState('/dogs/?limit=3&offset=0');
   const axiosPrivate = useAxiosPrivate();
   const navigate = useNavigate();
   const location = useLocation();
+  const {auth} = useAuth();
 
   const getDogs = async (url, options = null) => {
-      setUrl(url);
+    setUrl(url);
       try {
           const response = await axiosPrivate.get(url, options);
           console.log(response.data);
@@ -50,18 +53,21 @@ function App() {
       }
   }, []);
 
-  const dogAddHandler = async ({name}) => {
-    console.log('DOG: ', name);
-    const response = await axiosPrivate.post('/dogs/', JSON.stringify({id: 0, name}));
+  const dogAddHandler = async (dog) => {
+    console.log(dog); 
+    const response = await axiosPrivate.post('/dogs/', JSON.stringify(dog));
     console.log(response.data);
     getDogs(url);
   }
-  const dogUpdateHandler = async (dog) => {
-    console.log('DOG: ', dog);
-    const response = await axiosPrivate.put('/dogs/', JSON.stringify(dog));
+
+  const dogDeleteHandler = async (dog) => {
+    console.log(dog); 
+    //const response = await axiosPrivate.delete(`/dogs/`, {data : JSON.stringify(dog.id)});
+    const response = await axiosPrivate.delete(`/dogs/${dog.id}`);
     console.log(response.data);
     getDogs(url);
   }
+
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
@@ -77,10 +83,10 @@ function App() {
         </Route>
 
         <Route element={<RequireAuth allowedRoles={[ROLES.Editor]} />}>
-          <Route path="dogs" element={<Dogs dogs={dogs} getDogs={getDogs} />} />
+          <Route path="dogs" element={<Dogs dogs={dogs} getDogs={getDogs}/>} />
           <Route path="dogs/create" element={<DogAdd addHandler={dogAddHandler} />} />
-          <Route path="dogs/view/:id" element={<DogDetail />} />
-          <Route path="dogs/edit/:id" element={<DogEdit updateHandler={dogUpdateHandler} />} />
+          <Route path="/dogs/view/:id" element={<DogView />} />
+          <Route path="/dogs/delete/:id" element={<DogDelete deleteHandler={dogDeleteHandler}/>} />
         </Route>
 
 
